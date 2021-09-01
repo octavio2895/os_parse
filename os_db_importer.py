@@ -26,8 +26,8 @@ for i, zone in enumerate(zones):
         heat_sum += float(row[2])
     print(heat_sum)
     heat_per_zone.append(heat_sum)
-    if i > 2: # Only analyses the first 3 iterations.
-        break
+    #if i > 2: # Only analyses the first 3 iterations.
+     #   break
 building_heat_per_hour = []
 for i in range(len(zone_data[0])): # TODO Change this to numpy
     heat = 0
