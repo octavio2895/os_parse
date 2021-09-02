@@ -18,8 +18,8 @@ class EPlusDB():
     '''
     def query_zone_info(self, zone_name):
 
+        print(zone_name)
         cursor = self.con.cursor()
-
         cursor.execute("""SELECT ReportData.ReportDataDictionaryIndex, ReportData.TimeIndex, ReportData.Value, ReportDataDictionary.ReportDataDictionaryIndex, ReportDataDictionary.KeyValue, ReportDataDictionary.Name, Time.TimeIndex, Time.DayType
         FROM ReportData
         JOIN ReportDataDictionary
@@ -68,9 +68,9 @@ class EPlusDB():
         #TODO be more descriptive
         return("EnergyPlus Database\nZones:%d" % self.zones_len)
 
-eplusdb = EPlusDB()
-eplusdb.connect_db("db/eplusout.sql")
-names = eplusdb.query_zones_names()
+zone = EPlusDB()
+zone.connect_db("db/eplusout.sql")
+names = zone.query_zones_names()
 print(names[0][1])
-zone1 = eplusdb.query_zone_info(names[0][1])
+zone1 = zone.query_zone_info(names[0][1])
 print(zone1)
