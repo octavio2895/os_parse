@@ -5,7 +5,7 @@ class Zone():
     Abstracts zone information
     '''
     def get_timed_data(self):
-        print(self.timed_data)
+        return self.timed_data
 
     def __init__(self, zone_data=None):
         self.zone_data = zone_data #TODO assure this is an array
@@ -37,12 +37,28 @@ class EPlusDB():
         timed_data = cursor.fetchall()
         return timed_data 
 
-    def get_all_zones_data(self):
+    def get_all_zones_hourly(self):
+        self.all_zones_timed_data = [0]*len(self.zones[1].timed_data)
+        for zone in self.zones:
+            self.all_zones_timed_data = [sum(x) for x in zip(self.all_zones_timed_data, zone.timed_data)]
+
+    def get_all_zones_data(self, num=None):
         self.query_zones_names()
         print("Requested zones: %d" % self.zones_len) #TODO Implement a logger
-        for name in self.zones_names:
-            self.zones.append(Zone(self.query_zone_info(name)))
-        return  
+
+        if num == None:
+            for name in self.zones_names:
+                self.zones.append(Zone(self.query_zone_info(name)))
+            return  
+
+        elif num > 0:
+            for i, name in enumerate(self.zones_names):
+                self.zones.append(Zone(self.query_zone_info(name)))
+                if i >= num:
+                    return
+                return
+        else: 
+            return
 
     def query_zones_names(self):
         '''
@@ -77,6 +93,7 @@ class EPlusDB():
         self.zones_len = 0
         self.zones_names = None
         self.zones = []
+        self.all_zones_timed_data = []
 
     def __str__(self):
         #TODO be more descriptive
@@ -85,8 +102,10 @@ class EPlusDB():
 eplusdb = EPlusDB()
 eplusdb.connect_db("db/eplusout.sql")
 eplusdb.get_all_zones_data()
-for zone in eplusdb.zones:
-    print(zone)
+eplusdb.get_all_zones_hourly()
+print(sum(eplusdb.all_zones_timed_data))
+#for zone in eplusdb.zone
+#    print(zone)
 '''
 names = eplusdb.query_zones_names()
 print(names[0][1])
