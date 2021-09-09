@@ -9,32 +9,33 @@ class Zone():
         Generates a useful dictionary for each zone
         '''
         self.dict = {
-                "name": self.zone_name,
-                "area": self.zone_area,
+                "name": self.name,
+                "area": self.area,
                 "yearly_cooling_load": self.yearly_cooling_load,
                 "average_cooling_load": self.average_cooling_load,
                 "average_temperature": self.average_temperature,
                 "average_humidity": self.average_humidity,
         }
+        return self.dict
 
     def get_timed_data(self):
         return self.timed_data
 
     def __init__(self, zone_data=None):
-        self.zone_data = zone_data #TODO assure this is an array
-        self.zone_area = None
-        self.yearly_cooling_load = None
-        self.average_cooling_load = None
-        self.average_temperature = None
-        self.average_humidity = None
-        self.zone_name = zone_data[0][4]
+        self.data = zone_data #TODO assure this is an array
+        self.area = 0
+        self.yearly_cooling_load = 0
+        self.average_cooling_load = 0
+        self.average_temperature = 0
+        self.average_humidity = 0
+        self.name = zone_data[0][4]
         self.timed_data = [row[2] for row in zone_data] 
         self.timed_data_len = len(self.timed_data)
         self.get_zone_dict()
         return
 
     def __str__(self):
-        return("EnergyPlus Zone: %s\nNumber of entries: %d" % (self.zone_name, self.timed_data_len))
+        return("EnergyPlus Zone: %s\nArea: %f m2\nYearly Cooling Load: %f kWh\nAverage Cooling Load: %f kWh\nAverage Temperature: %f C\nAverage Humidity: %f" % (self.name, self.area, self.yearly_cooling_load, self.average_cooling_load, self.average_temperature, self.average_humidity))
         
 class EPlusDB():
     '''
@@ -65,7 +66,7 @@ class EPlusDB():
         self.all_zones_monthly = [0]*12
         for month_index, month in enumerate(self.all_zones_monthly):
             for zone in self.zones:
-                for row in zone.zone_data:
+                for row in zone.data:
                     if (int(row[8])-1) == month_index:
                         self.all_zones_monthly[month_index] += float(row[2])
 
@@ -148,4 +149,4 @@ eplusdb.get_all_zones_monthly()
 print(sum(eplusdb.all_zones_timed_data))
 print(eplusdb.all_zones_monthly)
 print(sum(eplusdb.all_zones_monthly))
-
+print(eplusdb.zones[0])
