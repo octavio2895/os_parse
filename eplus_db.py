@@ -4,10 +4,15 @@ class Zone():
     '''
     Abstracts zone information
     '''
+    def analyze_zone(self):
+        self.yearly_cooling_load = sum(self.timed_data)
+        self.average_cooling_load = self.yearly_cooling_load/len(self.timed_data)
+
     def get_zone_dict(self):
         '''
         Generates a useful dictionary for each zone
         '''
+        self.analyze_zone()
         self.dict = {
                 "name": self.name,
                 "area": self.area,
@@ -87,8 +92,10 @@ class EPlusDB():
         print("Requested zones: %d" % self.zones_len) #TODO Implement a logger
 
         if num == None:
-            for name in self.zones_names:
-                self.zones.append(Zone(self.query_zone_info(name)))
+            for name, area in zip(self.zones_names, self.zones_area):
+                z = Zone(self.query_zone_info(name))
+                z.area = area
+                self.zones.append(z)
             return  
 
         elif num > 0:
@@ -107,7 +114,9 @@ class EPlusDB():
         if self.is_connected:
             cursor = self.con.cursor()
             cursor.execute("select * from zones") 
-            self.zones_names = [row[1] for row in cursor.fetchall()]
+            data = cursor.fetchall()
+            self.zones_names = [row[1] for row in data]
+            self.zones_area = [row[22] for row in data]
             self.zones_len = len(self.zones_names)
             return self.zones_names
         else:
@@ -139,7 +148,7 @@ class EPlusDB():
     def __str__(self):
         #TODO be more descriptive
         return("EnergyPlus Database\nZones:%d" % self.zones_len)
-
+'''
 eplusdb = EPlusDB()
 eplusdb.connect_db("/home/octavio/files/user1/project1/result/eplusout.sql")
 #eplusdb.connect_db("db/eplusout.sql")
@@ -149,4 +158,6 @@ eplusdb.get_all_zones_monthly()
 print(sum(eplusdb.all_zones_timed_data))
 print(eplusdb.all_zones_monthly)
 print(sum(eplusdb.all_zones_monthly))
-print(eplusdb.zones[0])
+for zone in eplusdb.zones:
+    print(zone)
+'''
